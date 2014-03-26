@@ -5,7 +5,12 @@ native `$resource` service to work well with Hypermedia APIs using [HAL](http://
 
 ## Installation
 
+Installation is easy using [Bower](http://bower.io).
+
     bower install angular-hyper-resource
+    
+Before explaining how to use the module, I think it is useful to provide a somewhat
+lengthy background to motivate what the problems the module is solving.
 
 ## HATEOAS and Linking within an API
 
