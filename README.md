@@ -449,16 +449,19 @@ This module is still in the development phase; it hasn't been used in any
 production environments yet, and some of the core functionalty is still under
 question.
 
+That said, there is a set of unit tests for the core parts of the module, so it at least
+basically works as advertised.
+
 In particular:
 
 - There may be a better way for the `$rel` method to determine if it should
   return an array vs an object.  For example, It may be desirable to have the
-  `$rel` method return an array if the `_links` or `_embedded`
+  `$rel` method return an array if the `_links` or `_embedded`.
 - We may want to provide a different default type resolver.
 - It may be nice to provide simpler support for chaining `$rel` calls (where
-  you don't have to use promises directly.
+  you don't have to use promises directly).
 
-Please email me at [johndgiese@gmail.com](mailto:johdgiese@gmail.com). if you
+Please email me at [johndgiese@gmail.com](mailto:johdgiese@gmail.com) if you
 have any questions or suggestions!
 
 ## Thanks
