@@ -138,15 +138,17 @@ interacting with related resources.  This is where the `hyperResource` module
 comes in.  It provides a single service, `hResource`, that is a small and
 somewhat opinionated extension of the `$resource` service.
 
-## Basic assumptions made by the API
+## API Constraints
 
-The hResource service attempts to abstract away the distinction between a
-`_linked` and `_embedded` resource; from the angular app's perspective, the
-distinction should be purely a matter of performance.  When resolving a related
-resource, the hResource returns a promise for that resource.  If it is
-embedded, the promise will be fulfilled quickly, if is a link, it will be a
-fulfilled after another round trip to the API.  This abstraction allows the API
-to worry about performance and caching issues, while freeing the client to work
+This "opinionated" approach to HAL places a few extra constraints on the API.
+
+Because the hResource service attempts to abstract away the distinction between a
+`_linked` and `_embedded` resource, the API must always return one or the other (and not both).
+
+Following this makes the angular app simplier, because it doesn't have to worry about which is which when resolving a related resource.  Instead, the app is returned a promise for the resource, and the distinction between a linked vs. embedded resource only determines how quickly that promise will be fulfilled.  If is a link, it will be a
+fulfilled after another round trip to the API, otherwise it will be fulfilled immediately.  
+
+This abstraction allows the API to worry about performance and caching issues, while freeing the client to work
 with the resources.
 
 From now on, a "related resource" can be either linked or embedded, as the
@@ -216,14 +218,21 @@ $httpBackend.expectGET('/city/5').respond(200, cityData);
 var boston = City.get({name: 'Boston'});
 $httpBackend.flush();
 
-var state = boston.$rel('state');
-var country = boston.$rel('country');
+var stateData = { name: 'Massachusets' };
 
-country.then(function(){ 
+$httpBackend.expectGET('/states/7').respond(200, stateData);
+var state = boston.$rel('state')
+.then(function(){
+    expect(state.name).toBe('Massachusets');
+});
+
+var country = boston.$rel('country')
+.then(function(){ 
     expect(country.name).toBe('United States of America');
 });
 ````
 
+Again, notice that there is not distinction between embedded and linked resources!
 
 ### The `$if` resource instance method
 
@@ -238,7 +247,7 @@ expect(book.$if('state')).toBe(1);
 expect(book.$if('mayor')).toBe(0);
 ````
 
-## Advanced Use with the Active Record
+## Advanced Use and Active Records
 
 The above useage pattern is great for many basic situations, however astute readers may have noticed
 that the related resources returned by `$rel` are no longer $resource instances!
