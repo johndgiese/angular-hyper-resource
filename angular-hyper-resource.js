@@ -151,7 +151,7 @@
   });
 
 
-  // default resource resolver
+  // default resource type resolver
   function resourceTypeFromLinkType(linkOrEmbedded) {
     var isEmbedded = linkOrEmbedded._links && linkOrEmbedded._links.self;
     if (isEmbedded) {
