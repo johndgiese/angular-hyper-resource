@@ -3,6 +3,10 @@
 Hyper Resource is an [angularjs](http://angularjs.org) module that extends angular's
 native `$resource` service to work well with Hypermedia APIs using [HAL](http://stateless.co/hal_specification.html).
 
+## Installation
+
+    bower install angular-hyper-resource
+
 ## HATEOAS and Linking within an API
 
 Single page applications usually require an API to persist data.
