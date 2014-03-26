@@ -143,7 +143,7 @@ somewhat opinionated extension of the `$resource` service.
 This "opinionated" approach to HAL places a few extra constraints on the API.
 
 Because the hResource service attempts to abstract away the distinction between a
-`_linked` and `_embedded` resource, the API must always return one or the other (and not both).
+`_linked` and `_embedded` resource, the API must always return one or the other (and not both, otherwise both will be returned).
 
 Following this makes the angular app simplier, because it doesn't have to worry about which is which when resolving a related resource.  Instead, the app is returned a promise for the resource, and the distinction between a linked vs. embedded resource only determines how quickly that promise will be fulfilled.  If is a link, it will be a
 fulfilled after another round trip to the API, otherwise it will be fulfilled immediately.  
