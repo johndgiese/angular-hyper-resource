@@ -1,4 +1,4 @@
-# Hyper Resource
+# Angular Hyper Resource
 
 Hyper Resource is an [angularjs](http://angularjs.org) module that extends angular's
 native `$resource` service to work well with Hypermedia APIs using [HAL](http://stateless.co/hal_specification.html).
@@ -117,7 +117,7 @@ purpose.  It works nearly identically to links.
 
 As you can see, embedded resources can have links (and even further embedded resources).
 
-So that is HAL!  Quite simple really.  I should also mention that you can use the special mime type, "application/hal+json", if you want to.
+So that is HAL!  Quite simple really.  I should also mention that you can use the special mime type, "application/hal+json", if you want to be cool.
 
 ## AngularJs and HAL
 
