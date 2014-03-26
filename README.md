@@ -227,8 +227,73 @@ country.then(function(){
 
 ### The `$if` resource instance method
 
+Hyper objects also get an `$if` method.  It takes the same arguments as the `$rel` method, except
+instead of returning a promise to those resources, it simply returns the number of matching resources.  
+This is useful if you are conditionally displaying items in your view.
 
+````js
+// continueing the example from above
 
+expect(book.$if('state')).toBe(1);
+expect(book.$if('mayor')).toBe(0);
+````
+
+## Advanced Use with the Active Record
+
+The above useage pattern is great for many basic situations, however astute readers may have noticed
+that the related resources returned by `$rel` are no longer $resource instances!
+
+````js
+var Chapter = hResource('/chapters/:id');
+var chapterData = {
+  title: 'Inheritance',
+  _links: {
+      first: { href: '/books/1/chapters/1' },
+      last: { href: '/books/1/chapters/10', title: 'Beautiful Features' },
+  },
+  _embedded: {
+    next: { title: 'Arrays' }
+    prev: { title: 'Functions' }
+  }
+};
+
+var chapterFour = new Chapter(chapterData);
+// could also have used Chapter.get
+
+expect(chapterFour instanceof Chapter).toBe(true);
+
+var chapterFive = chapterFour.$rel('next');
+
+expect(chapterFive instanceof Chapter).toBe(false);
+
+// because how could it know what type it should be?
+````
+
+Again, this is probably fine for many situations, however it is often nice to attach
+[functionality along with our resouce data](http://en.wikipedia.org/wiki/Active_record_pattern), and when using the
+`$resource` service this is done by extending the resource's prototype
+function.  If related resources don't preserve the initial type, our instances
+won't be able to access our added functionality.
+
+````js
+// here is how you would extend a person resource
+var Person = hResource('/persons/:id');
+Person.prototype.fullName = function() {
+    return this.firstName + this.lastName;
+};
+
+var person = Person.get({firstName: 'David'});
+
+var myName = person.$promise.then(function(me) {
+    // this would work as expected
+    return me.fullName();
+});
+
+var momsName = person.$rel('mother').then(function(mom) {
+    // this would NOT work (yet!)
+    return mom.fullName();
+});
+````
 
 ## Advanced Use with the Active Record Design Pattern
 
