@@ -7,21 +7,20 @@ native `$resource` service to work well with Hypermedia APIs using [HAL](http://
 
 Single page applications usually require an API to persist data.
 
-One of the tenants of RESTful APIs is the principal of [HATEOAS](http://en.wikipedia.org/wiki/HATEOAS), or 
-Hypermedia as the Engine of Application State.  The word sounds complicated,
-and maybe it is complicated and I don't understand it fully, but I see HATEOAS
-to mean your API should be a state-machine, and state-transitions should occur
-by following some sort of "hyperlink".  If you think about it, this is how the
-web works: we go to a page (a resource, or state) and we move to other pages by
-clicking links (state transitions).
+One of the tenants of RESTful APIs is [HATEOAS](http://en.wikipedia.org/wiki/HATEOAS), or 
+Hypermedia as the Engine of Application State.  The word sounds complicated but
+stated simply, HATEOAS says your API should be like a state-machine, and state-transitions
+should occur by following some sort of "hyperlink".  If you think about it,
+this is how the web works: we go to a page (a resource, or state) and we move
+to other pages by clicking links (state transitions).
 
 Very few APIs fully follow HATEOAS, and there is quite a bit of debate online
 as to how important it is.  I think one of the reasons many APIs don't follow
-it, is simply because unlike humans browsing the web, how will follow links as
+it, is simply because unlike humans browsing the web, who follow links as
 their curiosity directs, machines are usually interacting with a resource for a
-set purpose.  Thus the idea that a machine will `discover` and API purely
-through links doesn't seem to work.  That said, I think there are some serious
-benefits for using HATEOAS when it makes sense (statement intentionally open-ended).
+known purpose.  Thus the idea that a machine will `discover` an API purely
+through links doesn't seem to work well in practice.  That said, there
+are some serious benefits to following HATEOAS when it makes sense.
 
 In the context of an API, this means a resource should have links to other
 resources.  How is a link represented in an API?  Well, there are many ways you
@@ -81,8 +80,8 @@ When interacting with RESTful APIs, it is often useful to embedd multiple
 resources in a single request so that we can avoid multiple round trips to the
 server.  For example, imagine we have a `book` resource with chapters.
 Whenever we retrieve the `book` resource we will nearly always want to look at
-the current chapter.  HAL has a second reserverd keyword, `_embedded`, that is
-reserved for this purpose.  It works nearly identically to links.
+the current chapter.  HAL has a second reserverd keyword, `_embedded`, for this
+purpose.  It works nearly identically to links.
 
 
 ````json
@@ -134,19 +133,24 @@ Take a look at the [documentation for $resource](http://docs.angularjs.org/api/n
 for more details and some examples.
 
 When interacting with an API that uses HAL, we want all of ngResource's functionality, but
-it would also be nice if the service provided convenience methods for interacting with 
-related resources.  This is where the `hyperResource` module comes in.  It provides a single service, `hResource`, 
-that is a small and somewhat opinionated extension of the `$resource` service.
+it would also be nice if the service provided convenience methods for
+interacting with related resources.  This is where the `hyperResource` module
+comes in.  It provides a single service, `hResource`, that is a small and
+somewhat opinionated extension of the `$resource` service.
 
-## Linked and embedded resources are assumed to be semantically identical
+## Basic assumptions made by the API
 
-The hResource service attempts to abstract away the distinction between a `_linked` and `_embedded` resource;
-from the angular app's perspective, the distinction should be purely a matter of performance.  When resolving a related
-resource, the hResource returns a promise for that resource.  If it is embedded, the promise will be fulfilled quickly, if 
-is a link, it will be a fulfilled after another round trip to the API.  This abstraction allows the API to worry about 
-performance and caching issues, while freeing the client to work with the resources.
+The hResource service attempts to abstract away the distinction between a
+`_linked` and `_embedded` resource; from the angular app's perspective, the
+distinction should be purely a matter of performance.  When resolving a related
+resource, the hResource returns a promise for that resource.  If it is
+embedded, the promise will be fulfilled quickly, if is a link, it will be a
+fulfilled after another round trip to the API.  This abstraction allows the API
+to worry about performance and caching issues, while freeing the client to work
+with the resources.
 
-From now on, a "related resource" can be either linked or embedded, as the distinction is irrelevant.
+From now on, a "related resource" can be either linked or embedded, as the
+distinction is irrelevant.
 
 ## Basic Use
 
