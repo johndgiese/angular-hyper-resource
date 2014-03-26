@@ -19,11 +19,9 @@
   "license": "MIT",
   "ignore": [
     "**/.*",
-    "node_modules",
-    "bower_components",
     "vendor",
-    "test",
-    "tests"
+    "karma.config.js",
+    "**/*.spec.js"
   ],
   "dependencies": {
     "angular": "~1.2",
