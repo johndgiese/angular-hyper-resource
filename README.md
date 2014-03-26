@@ -295,23 +295,73 @@ var momsName = person.$rel('mother').then(function(mom) {
 });
 ````
 
-## Advanced Use with the Active Record Design Pattern
+Fortuneatly, `hResource` provides a mechanism for resolve related resource's
+types.
 
-except they take an extra first argument when being instantiated.  The
-remaining three arguments are identical to those passed into the $resource
-service.
+### Resolving related resource types
 
-### Default resource type resolver uses the `type` link attribute
+There are two steps involved with preserving resource types.
+
+1. the hResource service must be able to keep track of all types
+2. the hResource service must be able to resolve the type of a relatd resource
+   from the HAL link
+
+Both steps are pretty trivial.
+
+The first step involves providing an extra `typeName` when creating your
+resource.  For example:
+
+````js
+var userTypeName = 'user';
+var User = hResource(userTypeName, '/users/:id');
+````
+
+The second step is a bit more complicated.  Essentially, everytime the `$rel` method is called, 
+it has a method called `resolveResourceType` which is passed in the link of the related resouce.  This will be the `_self` link for an embedded resource.
+
+By default, the `hResource` service uses the optional `type` attribute of the
+link.  So if we go back to the chapter example we would need to have:
+
+````js
+var chapterData = {
+  title: 'Inheritance',
+  _links: {
+      first: { href: '/books/1/chapters/1', type: 'chapter' },
+      last: { 
+          href: '/books/1/chapters/10',
+          title: 'Beautiful Features',
+          type: 'chapter' 
+      },
+  },
+  _embedded: {
+    next: { title: 'Arrays', type: 'chapter' }
+    prev: { title: 'Functions', type: 'chapter' }
+  }
+};
+````
+
+If the hResource service is unable to resolve the type (or if the type it
+resolves to is not registered), it will simply revert to the basic behavior
+defined previously.
 
 ### Custom resource type resolver
 
-The hResourceProvider has a single function,
-`setResourceTypeResolver`.  Once can pass in a custom typeResolver,
-i.e. a function that takes a link or embedded resource and
-returns a string matching the appropriate hResource's `resourceName`.  All
-typeResolver functions should return `undefined` if they can not resolve a
-type.  If the resolved type is undefined, or does not match any declared
-`resourceType`s, then the Object type is used instead.
+There are many other possibly approachs for resolving a resource's type.
+
+- Resolved from the URL
+- Default to the same type as the parent
+- From an href template scheme
+
+For this reason, the `hyperResource` app provides the ability to override the default behavior with the `hResourceProvider`.
+
+The hResourceProvider has a single function, `setResourceTypeResolver`, that takes a custom typeResolver.
+
+This function that takes a link or embedded resource and returns a string
+matching the appropriate hResource's `resourceName` (the first argument passed
+in when constructing an hResource).  All typeResolver functions should return
+`undefined` if they can not resolve a type.  If the resolved type is undefined,
+or does not match any declared `resourceType`s, then the Object type is used
+instead.
 
 ## Questions
 
