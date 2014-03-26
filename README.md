@@ -365,7 +365,7 @@ instead.
 
 ## Questions
 
-__How does `hResource` deal with $resource's approach to returning empty arrays and objects?__
+__How does `hResource` deal with $resource's approach of returning empty arrays and objects?__
 
 The short answer is: Although the `$rel` and `$if` methods exist on the
 unresolved resources, calling them before they resolve will throw an error.
@@ -383,8 +383,8 @@ var User = $resource('/users/:id');
 
 var user = User.get({id: 1});  
 
-// user is NOT a promise, but is a nearly object that will "fill" up with data
-// once the underlying promise for the resource is fullfilled.
+// user is NOT a promise, but is a nearly empty object that will "fill" up with
+// data once the underlying promise for the resource is fullfilled.
 
 var allUsers = User.query();
 
@@ -398,14 +398,22 @@ do the following:
 
 ````js
 
-// if quieres returned promises
+// if queries returned promises we would need to do this
 var user = User.get({id: 1});
 user.then(function(){
     $scope.user = user;
 });
 
-// instead we can do this
+// because if we attached the promise to the scope directly, it wouldn't know
+// how to resolve it; interestingly, angular used to handle promises, but they
+// deprecated the feature (probably for performance reasons)
+
+// since $resource queireis return empty objects or arrays, we can do this
 $scope.user = User.get({id: 1});
+
+// because $scope.user will initially be an empty object, and when the
+// underlying promise resolves, the data is attached, and the $digest cycle will
+// know how to update the view
 
 ````
 
