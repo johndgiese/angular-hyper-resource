@@ -343,8 +343,14 @@ var chapterData = {
       },
   },
   _embedded: {
-    next: { title: 'Arrays', type: 'chapter' }
-    prev: { title: 'Functions', type: 'chapter' }
+    next: { 
+        _links: { self: {type: 'chapter' }},
+        title: 'Arrays'
+    }
+    prev: {
+        _links: { self: {type: 'chapter' }},
+        title: 'Functions', type: 'chapter' 
+    }
   }
 };
 ````
