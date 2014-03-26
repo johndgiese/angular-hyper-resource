@@ -177,24 +177,57 @@ var jsBooks = Book.query({includes: 'javascript'});
 var linearAlgebra = Book.get({title: 'Linear Algebra', author: 'Strang'});
 ````
 
-hResource instances are provided all of the `$resource` methods (e.g. `$save`), in addition to two convenience 
-methods specifically for interacting with related resources.
-
-
-
+hResource instances are provided all of the `$resource` methods (e.g. `$save`),
+in addition to two convenience methods specifically for interacting with
+related resources.  
 
 ### The `$rel` resource instance method
+
+The first resource instance method, `$rel`, provides a simple interface for
+grabbing related resources.  It takes a single required argument that specifies
+the relationship (i.e. the [rel attribute]
+(https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types) in
+HTML links), and a second optional argument for relationship name.
+
+The `$rel` method returns a promise for the related resouces.  
+
+- If there is a single match, the promise will resolve to a "hyper-object"---an
+  object containing all of the data returned from the API plus the two extra
+  `$rel` and `$if` methods.  
+- If there are multiple matches, the promise resolves to an array of hyper
+  objects.  
+- If it can't find the resource, the promise is rejected.  
+
+This is best demonstrated with an example:
+
+````js
+var City = hResource('/cities/:id');
+var cityData = {
+    name: 'Boston',
+    _links: {
+        self: { href: '/cities/5' },
+        state: { href: '/states/7' },
+    },
+    _embedded: {
+        country: { name: 'United States of America' }
+    }
+};
+$httpBackend.expectGET('/city/5').respond(200, cityData);
+var boston = City.get({name: 'Boston'});
+$httpBackend.flush();
+
+var state = boston.$rel('state');
+var country = boston.$rel('country');
+
+country.then(function(){ 
+    expect(country.name).toBe('United States of America');
+});
+````
 
 
 ### The `$if` resource instance method
 
 
-
-except resource instances are provided an extra `$get` method that
-takes two properties, `relation` and optionally `name`, and returns a
-promise to these related resources.  If there is more than one related
-resource, the promise resolves to an array of resources.  If there is
-just one resource, the promise resolves to that individual resource.
 
 
 ## Advanced Use with the Active Record Design Pattern
