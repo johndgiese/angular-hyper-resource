@@ -211,6 +211,25 @@ describe('The hal resource', function() {
 
       });
     });
+
+    it("the `$rel` and `$if` methods can't be called from a resource object until it is resolved", function() {
+      $httpBackend.expectGET('/books/1').respond(200, bookData);
+
+      var book = Book.get({id: 1});
+
+      expect(book.$if).toBeDefined();
+
+      expect(book.$if('chapter')).toThrow();
+      expect(book.$get('chapter')).toThrow();
+
+      book.$promise.then(function(){
+        expect(book.$if('chapter')).toBe(2);
+      });
+
+      $httpBackend.flush();
+      
+    });
+
     
   });
 

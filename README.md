@@ -211,6 +211,63 @@ typeResolver functions should return `undefined` if they can not resolve a
 type.  If the resolved type is undefined, or does not match any declared
 `resourceType`s, then the Object type is used instead.
 
+## Questions
+
+__How does `hResource` deal with $resource's approach to returning empty arrays and objects?__
+
+The short answer is: Although the `$rel` and `$if` methods exist on the
+unresolved resources, calling them before they resolve will throw an error.
+
+If this answer didn't make sense, continue reading:
+
+A subtle but key aspect of the $resource service, is
+that resources returned from queries are not promises, but rather are empty
+objects or arrays that are filled in with data when the underlying promise is fullfilled.
+
+For example:
+
+````js
+var User = $resource('/users/:id');
+
+var user = User.get({id: 1});  
+
+// user is NOT a promise, but is a nearly object that will "fill" up with data
+// once the underlying promise for the resource is fullfilled.
+
+var allUsers = User.query();
+
+// allUsers is an empty array that is filled as the promise for the resource is
+// fulfilled
+````
+
+The $resource class does this to make it easy when injecting resource instances
+into the scope; if the queries returned a promise directly, one would need to
+do the following:
+
+````js
+
+// if quieres returned promises
+var user = User.get({id: 1});
+user.then(function(){
+    $scope.user = user;
+});
+
+// instead we can do this
+$scope.user = User.get({id: 1});
+
+````
+
+The underlying promise can be accessed via the `$promise` attribute (e.g.
+`user.$promise`), and one can see if they have been resolved using the
+`$resolved` attribute.
+
+Unfortuneatly, although useful in simple cases when attaching resources onto
+the scope, it can be confusing when there are related dependencies between
+resources.  In particular, if one tried calling `$if` before a resource
+instance's underlying promise is resolved, it would return 0!  To avoid this
+mistake, calling `$if` or `$rel` on an unresolved resource instance will throw
+an error!
+
 ## Additional Constraints placed on the HAL specification
 
 In summary, the default setup of the hyperResource module places these
