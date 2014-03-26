@@ -421,33 +421,38 @@ The underlying promise can be accessed via the `$promise` attribute (e.g.
 `user.$promise`), and one can see if they have been resolved using the
 `$resolved` attribute.
 
-Unfortuneatly, although useful in simple cases when attaching resources onto
-the scope, it can be confusing when there are related dependencies between
-resources.  In particular, if one tried calling `$if` before a resource
-instance's underlying promise is resolved, it would return 0!  To avoid this
-mistake, calling `$if` or `$rel` on an unresolved resource instance will throw
-an error!
+Unfortuneatly, although this "refernce injection" approach is useful in simple
+cases when attaching resources onto the scope, it can be confusing when there
+are related dependencies between resources.  In particular, if one tried
+calling `$if` before a resource instance's underlying promise is resolved, it
+would return 0!  To avoid this mistake, calling `$if` or `$rel` on an
+unresolved resource instance will throw an error!
 
-## Additional Constraints placed on the HAL specification
+## Status of this module
 
-In summary, the default setup of the hyperResource module places these
-additional restrictions on a HAL API:
+This module is still in the development phase; it hasn't been used in any
+production environments yet, and some of the core functionalty is still under
+question.
 
-  - embedded and linked resources are semantically identical, and
-    collectively are referred to as "related resources"
-  - a related resource should either appear as an embedded or a link,
-    otherwise two copies of the resource will be returned by the instance
-    `$get` method
-  - if the client wants to use the Active Record pattern by extending
-    resource prototypes, then the API must provide a way to resolve the
-    resource types; using the default resourceTypeResolver, this means that
-    all links must provide a `type` attribute, and all embedded resources
-    must have a self link with a `type` attribute.
-  - the plurality of a specified "related resource" should be consistent
-    accross calls to keep the client code simple
+In particular:
 
+- There may be a better way for the `$rel` method to determine if it should
+  return an array vs an object.  For example, It may be desirable to have the
+  `$rel` method return an array if the `_links` or `_embedded`
+- We may want to provide a different default type resolver.
+- It may be nice to provide simpler support for chaining `$rel` calls (where
+  you don't have to use promises directly.
+
+Please email me at [johndgiese@gmail.com](mailto:johdgiese@gmail.com). if you
+have any questions or suggestions!
 
 ## Thanks
 
 The initial versions of this code were developed by [Cloudy Hills](cloudyhills.com),
 a web-development company based out of Austin Texas.
+
+Thanks for helpful discussions with;
+- [Ian Littman](https://github.com/iansltx)
+- [Ed Giese](https://github.com/edgiese)
+- [Yujan Shrestha](https://github.com/yujanshrestha)
+
