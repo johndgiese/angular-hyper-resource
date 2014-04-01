@@ -25,7 +25,9 @@
 
       HyperObject.prototype = {
         $rel: getRelatedResource,
-        $if: getRelatedResourceCount
+        $if: getRelatedResourceCount,
+        $link: getRelatedResourceLink,
+        $links: getRelatedResourceLinks
       };
 
       function hResourceFactory(resourceName, url, paramDefaults, actions) {
@@ -88,6 +90,25 @@
         return links.length + embeddeds.length;
       }
 
+      function getRelatedResourceLink(relation, name) {
+        var allLinks = getRelatedResourceLinks.apply(this, [relation, name]);
+        var matches = allLinks.length;
+        if (matches === 1) {
+          return allLinks[0];
+        }
+        if (matches >= 1) {
+          throw "Multiple links match!";
+        }
+        // else implicitily return undefined
+      }
+
+      function getRelatedResourceLinks(relation, name) {
+        var links = resolveLinks(this, relation, name);
+        var embeddeds = resolveEmbedded(this, relation, name);
+        var embeddedsLinks = embeddeds.map(getSelfLink);
+        var allLinks = links.concat(embeddedsLinks);
+        return allLinks;
+      }
 
       function resolveResource(linkOrEmbedded) {
         var resourceType = resourceTypeResolver(linkOrEmbedded);
@@ -157,6 +178,10 @@
       var link = linkOrEmbedded;
     }
     return link.type;
+  }
+
+  function getSelfLink(embedded) {
+    return embedded._links.self;
   }
 
   

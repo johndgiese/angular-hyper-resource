@@ -162,10 +162,25 @@ describe('The hal resource', function() {
 
   var bookData = {
     title: 'Transport Phenomena',
+    _links: {
+      self: {
+        href: '/books/0',
+      },
+      next: {
+        href: '/books/1',
+        title: 'Introduction to Fourier Optics',
+      }
+    },
     _embedded: {
       chapter: [
         {
           title: 'Viscosity and the Mechanism of Momentum Transport',
+          _links: {
+            self: {
+              href: '/books/0/chapter/1',
+              type: 'chapter',
+            }
+          },
           _embedded: {
             section: [
               {title: "Newton's Law of Viscosity"},
@@ -176,6 +191,12 @@ describe('The hal resource', function() {
         },
         {
           title: 'Shell Momentum Balances',
+          _links: {
+            self: {
+              href: '/books/0/chapter/2',
+              type: 'chapter',
+            }
+          },
         }
       ]
     }
@@ -188,7 +209,7 @@ describe('The hal resource', function() {
       Book = hResource('/books/:id', {id: '@id'});
     });
 
-    it('even so we still get our `$rel` and `$if` methods', function() {
+    it('even so we still get the extra methods (`$rel`, `$if`, etc.).', function() {
       
       var book = new Book(bookData);
 
@@ -210,13 +231,10 @@ describe('The hal resource', function() {
 
       });
     });
-
-
-    
   });
 
 
-  it("the `$rel` method can't be called from an unresolved resource", function() {
+  it("the `$rel` method can't be called from an unresolved resource.", function() {
 
     Book = hResource('/books/:id', {id: '@id'});
     $httpBackend.expectGET('/books/1').respond(200, bookData);
@@ -238,9 +256,9 @@ describe('The hal resource', function() {
   });
 
 
-  it("the `$if` method returns '0' from unresolved resource", function() {
+  it("the `$if` method returns `0` from unresolved resource.", function() {
 
-    Book = hResource('/books/:id', {id: '@id'});
+    var Book = hResource('/books/:id', {id: '@id'});
     $httpBackend.expectGET('/books/1').respond(200, bookData);
 
     var book = Book.get({id: 1});
@@ -257,6 +275,44 @@ describe('The hal resource', function() {
     });
 
     $httpBackend.flush();
+    
+  });
+
+
+  it('provide a `$link` and `$links` methods', function() {
+
+    var Book = hResource('/books/:id', {id: '@id'});
+    var book = new Book(bookData);
+
+    expect(book.$link('nonexistent')).toBe(undefined);
+    expect(book.$link('self').href).toBe('/books/0');
+    expect(book.$link('next').href).toBe('/books/1');
+    expect(book.$link('next').title).toBe('Introduction to Fourier Optics');
+
+    function getChapterLink() {
+      return book.$link('chapter');
+    }
+
+    function getChapterLinks() {
+      return book.$links('chapter');
+    }
+
+    expect(getChapterLink).toThrow();
+    expect(getChapterLinks).not.toThrow();
+    expect(angular.isArray(book.$links('chapter'))).toBe(true);
+
+    var expectedChapterLinks = [
+        {
+          href: '/books/0/chapter/1',
+          type: 'chapter',
+        },
+        {
+          href: '/books/0/chapter/2',
+          type: 'chapter',
+        }
+    ];
+
+    expect(getChapterLinks()).toEqual(expectedChapterLinks);
     
   });
   
