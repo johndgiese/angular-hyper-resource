@@ -83,9 +83,6 @@
       }
 
       function getRelatedResourceCount(relation, name) {
-        if (this.$resolved === false) {
-          throw "Can't count related resources until the resource has resolved";
-        }
         var links = resolveLinks(this, relation, name);
         var embeddeds = resolveEmbedded(this, relation, name);
         return links.length + embeddeds.length;

@@ -446,10 +446,10 @@ The underlying promise can be accessed via the `$promise` attribute (e.g.
 
 Unfortunately, although this "reference injection" approach is useful in simple
 cases when attaching resources onto the scope, it can be confusing when there
-are related dependencies between resources.  In particular, if one tried
-calling `$if` before a resource instance's underlying promise is resolved, it
-would return 0!  To avoid this mistake, calling `$if` or `$rel` on an
-unresolved resource instance will throw an error!
+are related dependencies between resources.  In particular, calling `$if`
+before a resource instance's underlying promise is resolved returns 0!  This behavior is allowed because `$if` calls are often made inside of templates, and in particular in `ng-show` directives; when used in this way, the item is hidden until the resource is resolved---probably the most reasonable behavior.
+
+Calling `$rel` before the resource resolves will throw an error, as it is unlikely that one would call `$rel` intentionally before the resource is resolved.
 
 ## Status of this module
 

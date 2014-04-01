@@ -160,6 +160,26 @@ describe('The hal resource', function() {
 
   });
 
+  var bookData = {
+    title: 'Transport Phenomena',
+    _embedded: {
+      chapter: [
+        {
+          title: 'Viscosity and the Mechanism of Momentum Transport',
+          _embedded: {
+            section: [
+              {title: "Newton's Law of Viscosity"},
+              {title: "Generalized Newton's Law"},
+              {title: "Pressure and Temperture Dependence"}
+            ]
+          }
+        },
+        {
+          title: 'Shell Momentum Balances',
+        }
+      ]
+    }
+  };
 
   describe("doesnt' require a declared resource type", function() {
 
@@ -168,28 +188,7 @@ describe('The hal resource', function() {
       Book = hResource('/books/:id', {id: '@id'});
     });
 
-    var bookData = {
-      title: 'Transport Phenomena',
-      _embedded: {
-        chapter: [
-          {
-            title: 'Viscosity and the Mechanism of Momentum Transport',
-            _embedded: {
-              section: [
-                {title: "Newton's Law of Viscosity"},
-                {title: "Generalized Newton's Law"},
-                {title: "Pressure and Temperture Dependence"}
-              ]
-            }
-          },
-          {
-            title: 'Shell Momentum Balances',
-          }
-        ]
-      }
-    };
-
-    it('even so we still get our `$rel` ane `$get` methods', function() {
+    it('even so we still get our `$rel` and `$if` methods', function() {
       
       var book = new Book(bookData);
 
@@ -212,26 +211,53 @@ describe('The hal resource', function() {
       });
     });
 
-    it("the `$rel` and `$if` methods can't be called from a resource object until it is resolved", function() {
-      $httpBackend.expectGET('/books/1').respond(200, bookData);
-
-      var book = Book.get({id: 1});
-
-      expect(book.$if).toBeDefined();
-
-      expect(book.$if('chapter')).toThrow();
-      expect(book.$get('chapter')).toThrow();
-
-      book.$promise.then(function(){
-        expect(book.$if('chapter')).toBe(2);
-      });
-
-      $httpBackend.flush();
-      
-    });
 
     
   });
 
+
+  it("the `$rel` method can't be called from an unresolved resource", function() {
+
+    Book = hResource('/books/:id', {id: '@id'});
+    $httpBackend.expectGET('/books/1').respond(200, bookData);
+
+    var book = Book.get({id: 1});
+
+    function getChapters(){
+      book.$rel('chapter');
+    }
+
+    expect(getChapters).toThrow();
+
+    book.$promise.then(function(){
+      expect(getChapters).not.toThrow()
+    });
+
+    $httpBackend.flush();
+    
+  });
+
+
+  it("the `$if` method returns '0' from unresolved resource", function() {
+
+    Book = hResource('/books/:id', {id: '@id'});
+    $httpBackend.expectGET('/books/1').respond(200, bookData);
+
+    var book = Book.get({id: 1});
+
+    function getChapterCount(){
+      book.$if('chapter');
+    }
+
+    expect(getChapterCount).not.toThrow();
+
+    book.$promise.then(function(){
+      expect(getChapterCount).not.toThrow()
+      expect(book.$if('chapter')).toBe(2);
+    });
+
+    $httpBackend.flush();
+    
+  });
   
 });
