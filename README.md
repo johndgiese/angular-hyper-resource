@@ -1,6 +1,6 @@
 # Angular Hyper Resource
 
-Hyper Resource is an [angularjs](http://angularjs.org) module that extends angular's
+Hyper Resource is an [angularjs](http://angularjs.org) module that extends Angular's
 native `$resource` service to work well with Hypermedia APIs using [HAL](http://stateless.co/hal_specification.html).
 
 ## Installation
@@ -60,7 +60,7 @@ resource.  There are also some optional properties, including a `name` and `type
 
 Here is an example:
 
-````json
+```json
 {
     "name": "John David Giese",
     "_links": {
@@ -83,17 +83,17 @@ Here is an example:
         ]
     }
 }
-````
+```
 
-When interacting with RESTful APIs, it is often useful to embedd multiple
+When interacting with RESTful APIs, it is often useful to embed multiple
 resources in a single request so that we can avoid multiple round trips to the
 server.  For example, imagine we have a `book` resource with chapters.
 Whenever we retrieve the `book` resource we will nearly always want to look at
-the current chapter.  HAL has a second reserverd keyword, `_embedded`, for this
+the current chapter.  HAL has a second reserved keyword, `_embedded`, for this
 purpose.  It works nearly identically to links.
 
 
-````json
+```json
 {
     "title": "Javascript: The Good Parts",
     "author": "Douglas Crockford",
@@ -122,26 +122,26 @@ purpose.  It works nearly identically to links.
         }
     }
 }
-````
+```
 
 As you can see, embedded resources can have links (and even further embedded resources).
 
 So that is HAL!  Quite simple really.  I should also mention that you can use the special mime type, "application/hal+json", if you want to be cool.
 
-## AngularJs and HAL
+## Angular and HAL
 
 Angular provides the `$resource` service (as part of the optional `ngResource` module)
 to help simplify API interactions.  Without something like the `$resource`
 service, one needs to construct the API's URLs and making requests with the
 `$http` service directly.  This can quickly get tedious.  By using the
 `$resource` service, one can define the URLs for interacting with their data
-resources, as well as which http methods are supported, and from then on they
+resources, as well as which HTTP methods are supported, and from then on they
 can use the resource at a higher level of abstraction.
 
 Take a look at the [documentation for $resource](http://docs.angularjs.org/api/ngResource/service/$resource)
 for more details and some examples.
 
-When interacting with an API that uses HAL, we want all of ngResource's functionality, but
+When interacting with an API that uses HAL, we want all of `ngResource`'s functionality, but
 it would also be nice if the service provided convenience methods for
 interacting with related resources.  This is where the `hyperResource` module
 comes in.  It provides a single service, `hResource`, that is a small and
@@ -151,10 +151,10 @@ somewhat opinionated extension of the `$resource` service.
 
 This "opinionated" approach to HAL places a few extra constraints on the API.
 
-Because the hResource service attempts to abstract away the distinction between a
+Because the `hResource` service attempts to abstract away the distinction between a
 `_linked` and `_embedded` resource, the API must always return one or the other (and not both, otherwise both will be returned).
 
-Following this makes the angular app simplier, because it doesn't have to worry about which is which when resolving a related resource.  Instead, the app is returned a promise for the resource, and the distinction between a linked vs. embedded resource only determines how quickly that promise will be fulfilled.  If is a link, it will be a
+Following this makes the angular app simpler, because it doesn't have to worry about which is which when resolving a related resource.  Instead, the app is returned a promise for the resource, and the distinction between a linked vs. embedded resource only determines how quickly that promise will be fulfilled.  If is a link, it will be a
 fulfilled after another round trip to the API, otherwise it will be fulfilled immediately.  
 
 This abstraction allows the API to worry about performance and caching issues, while freeing the client to work
@@ -169,26 +169,26 @@ We now know enough background to dive into the basics.
 
 The `hResource` service can be called identically to how the `$resource`
 service is called, and like the `$resource` service it returns a constructor
-function for interacting with APIs.  We reccomend creating services for each of your
+function for interacting with APIs.  We recommend creating services for each of your
 resources (don't forget to [capitalize them](http://stackoverflow.com/questions/1564398/javascript-method-naming-lowercase-vs-uppercase)
 because they are constructor functions!).  For example:
 
-````js
+```js
 angular.module('app', ['hyperResource'])
 .service('Book', ['hResource', function(hResource) {
     return hResource('/books/:bookId', {bookId: '@id'});
 });
-````
+```
 
 We can now use our `Book` service to retrieve books from the server like we would with `$resource`.  
 The following code could go anywhere where the `Book` service is injected.
 
-````js
+```js
 var jsBooks = Book.query({includes: 'javascript'});
 var linearAlgebra = Book.get({title: 'Linear Algebra', author: 'Strang'});
-````
+```
 
-hResource instances are provided all of the `$resource` methods (e.g. `$save`),
+`hResource` instances are provided all of the `$resource` methods (e.g. `$save`),
 in addition to two convenience methods specifically for interacting with
 related resources.  
 
@@ -200,7 +200,7 @@ the relationship (i.e. the [rel attribute]
 (https://developer.mozilla.org/en-US/docs/Web/HTML/Link_types) in
 HTML links), and a second optional argument for relationship name.
 
-The `$rel` method returns a promise for the related resouces.  
+The `$rel` method returns a promise for the related resources.  
 
 - If there is a single match, the promise will resolve to a "hyper-object"---an
   object containing all of the data returned from the API plus the two extra
@@ -211,7 +211,7 @@ The `$rel` method returns a promise for the related resouces.
 
 This is best demonstrated with an example:
 
-````js
+```js
 var City = hResource('/cities/:id');
 var cityData = {
     name: 'Boston',
@@ -239,7 +239,7 @@ var country = boston.$rel('country')
 .then(function(){ 
     expect(country.name).toBe('United States of America');
 });
-````
+```
 
 Again, notice that there is not distinction between embedded and linked resources!
 
@@ -249,19 +249,19 @@ Hyper objects also get an `$if` method.  It takes the same arguments as the `$re
 instead of returning a promise to those resources, it simply returns the number of matching resources.  
 This is useful if you are conditionally displaying items in your view.
 
-````js
+```js
 // continueing the example from above
 
 expect(book.$if('state')).toBe(1);
 expect(book.$if('mayor')).toBe(0);
-````
+```
 
 ## Advanced Use and Active Records
 
-The above useage pattern is great for many basic situations, however astute readers may have noticed
+The above usage pattern is great for many basic situations, however astute readers may have noticed
 that the related resources returned by `$rel` are no longer $resource instances!
 
-````js
+```js
 var Chapter = hResource('/chapters/:id');
 var chapterData = {
   title: 'Inheritance',
@@ -285,15 +285,15 @@ var chapterFive = chapterFour.$rel('next');
 expect(chapterFive instanceof Chapter).toBe(false);
 
 // because how could it know what type it should be?
-````
+```
 
 Again, this is probably fine for many situations, however it is often nice to attach
-[functionality along with our resouce data](http://en.wikipedia.org/wiki/Active_record_pattern), and when using the
+[functionality along with our resource data](http://en.wikipedia.org/wiki/Active_record_pattern), and when using the
 `$resource` service this is done by extending the resource's prototype
 function.  If related resources don't preserve the initial type, our instances
 won't be able to access our added functionality.
 
-````js
+```js
 // here is how you would extend a person resource
 var Person = hResource('/persons/:id');
 Person.prototype.fullName = function() {
@@ -311,17 +311,17 @@ var momsName = person.$rel('mother').then(function(mom) {
     // this would NOT work (yet!)
     return mom.fullName();
 });
-````
+```
 
-Fortuneatly, `hResource` provides a mechanism for resolve related resource's
+Fortunately, `hResource` provides a mechanism for resolve related resource's
 types.
 
 ### Resolving related resource types
 
 There are two steps involved with preserving resource types.
 
-1. the hResource service must be able to keep track of all types
-2. the hResource service must be able to resolve the type of a relatd resource
+1. the `hResource` service must be able to keep track of all types
+2. the `hResource` service must be able to resolve the type of a related resource
    from the HAL link
 
 Both steps are pretty trivial.
@@ -329,18 +329,18 @@ Both steps are pretty trivial.
 The first step involves providing an extra `typeName` when creating your
 resource.  For example:
 
-````js
+```js
 var userTypeName = 'user';
 var User = hResource(userTypeName, '/users/:id');
-````
+```
 
-The second step is a bit more complicated.  Essentially, everytime the `$rel` method is called, 
-it has a method called `resolveResourceType` which is passed in the link of the related resouce.  This will be the `_self` link for an embedded resource.
+The second step is a bit more complicated.  Essentially, every time the `$rel` method is called, 
+it has a method called `resolveResourceType` which is passed in the link of the related resource.  This will be the `_self` link for an embedded resource.
 
 By default, the `hResource` service uses the optional `type` attribute of the
 link.  So if we go back to the chapter example we would need to have:
 
-````js
+```js
 var chapterData = {
   title: 'Inheritance',
   _links: {
@@ -362,15 +362,15 @@ var chapterData = {
     }
   }
 };
-````
+```
 
-If the hResource service is unable to resolve the type (or if the type it
+If the `hResource` service is unable to resolve the type (or if the type it
 resolves to is not registered), it will simply revert to the basic behavior
 defined previously.
 
 ### Custom resource type resolver
 
-There are many other possibly approachs for resolving a resource's type.
+There are many other possibly approaches for resolving a resource's type.
 
 - Resolved from the URL
 - Default to the same type as the parent
@@ -378,11 +378,11 @@ There are many other possibly approachs for resolving a resource's type.
 
 For this reason, the `hyperResource` app provides the ability to override the default behavior with the `hResourceProvider`.
 
-The hResourceProvider has a single function, `setResourceTypeResolver`, that takes a custom typeResolver.
+The `hResourceProvider` has a single function, `setResourceTypeResolver`, that takes a custom `typeResolver`.
 
 This function that takes a link or embedded resource and returns a string
-matching the appropriate hResource's `resourceName` (the first argument passed
-in when constructing an hResource).  All typeResolver functions should return
+matching the appropriate `hResource`'s `resourceName` (the first argument passed
+in when constructing an `hResource`).  All `typeResolver` functions should return
 `undefined` if they can not resolve a type.  If the resolved type is undefined,
 or does not match any declared `resourceType`s, then the Object type is used
 instead.
@@ -391,18 +391,17 @@ instead.
 
 __How does `hResource` deal with $resource's approach of returning empty arrays and objects?__
 
-The short answer is: Although the `$rel` and `$if` methods exist on the
-unresolved resources, calling them before they resolve will throw an error.
+The short answer is: The `$rel` exists on unresolved resources, but calling it before they resolve will throw an error.  The `$if` exists and returns 0 on unresolved resources; this behavior is convenient because the `$if` method is often used in templates.
 
 If this answer didn't make sense, continue reading:
 
 A subtle but key aspect of the $resource service, is
 that resources returned from queries are not promises, but rather are empty
-objects or arrays that are filled in with data when the underlying promise is fullfilled.
+objects or arrays that are filled in with data when the underlying promise is fulfilled.
 
 For example:
 
-````js
+```js
 var User = $resource('/users/:id');
 
 var user = User.get({id: 1});  
@@ -414,13 +413,13 @@ var allUsers = User.query();
 
 // allUsers is an empty array that is filled as the promise for the resource is
 // fulfilled
-````
+```
 
 The $resource class does this to make it easy when injecting resource instances
 into the scope; if the queries returned a promise directly, one would need to
 do the following:
 
-````js
+```js
 
 // if queries returned promises we would need to do this
 var user = User.get({id: 1});
@@ -439,13 +438,13 @@ $scope.user = User.get({id: 1});
 // underlying promise resolves, the data is attached, and the $digest cycle will
 // know how to update the view
 
-````
+```
 
 The underlying promise can be accessed via the `$promise` attribute (e.g.
 `user.$promise`), and one can see if they have been resolved using the
 `$resolved` attribute.
 
-Unfortuneatly, although this "refernce injection" approach is useful in simple
+Unfortunately, although this "reference injection" approach is useful in simple
 cases when attaching resources onto the scope, it can be confusing when there
 are related dependencies between resources.  In particular, if one tried
 calling `$if` before a resource instance's underlying promise is resolved, it
@@ -455,7 +454,7 @@ unresolved resource instance will throw an error!
 ## Status of this module
 
 This module is still in the development phase; it hasn't been used in any
-production environments yet, and some of the core functionalty is still under
+production environments yet, and some of the core functionality is still under
 question.
 
 That said, there is a set of unit tests for the core parts of the module, so it at least
