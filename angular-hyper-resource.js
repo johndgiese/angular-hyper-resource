@@ -91,6 +91,10 @@
       }
 
       function getRelatedResourceLink(relation, name) {
+        if (typeof relation === 'undefined') {
+          relation = 'self';
+        }
+
         var allLinks = getRelatedResourceLinks.apply(this, [relation, name]);
         var matches = allLinks.length;
         if (matches === 1) {
