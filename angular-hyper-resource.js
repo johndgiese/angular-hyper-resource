@@ -154,8 +154,11 @@
       function getLinkResource(link) {
         var href = link.href;
         var Resource = resolveResource(link);
-        return $http.get(href).success(function(response) {
-          return new Resource(response.data);
+        return $http.get(href).then(function(response) {
+          if (200 <= response.status && response.status < 300) {
+            return new Resource(response.data);
+          }
+          // implicitly return undefined
         });
       }
 
