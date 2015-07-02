@@ -474,7 +474,7 @@ have any questions or suggestions!
 
 ## Thanks
 
-Check out my web-consulting company, [Innolitics](innolitics.com).
+Check out my web-consulting company, [Innolitics](http://innolitics.com).
 
 Thanks for helpful discussions with;
 - [Ian Littman](https://github.com/iansltx)
