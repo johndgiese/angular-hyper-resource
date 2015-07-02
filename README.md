@@ -474,8 +474,7 @@ have any questions or suggestions!
 
 ## Thanks
 
-The initial versions of this code were developed by [Cloudy Hills](cloudyhills.com),
-a web-development company based out of Austin Texas.
+Check out my web-consulting company, [Innolitics](innolitics.com).
 
 Thanks for helpful discussions with;
 - [Ian Littman](https://github.com/iansltx)
